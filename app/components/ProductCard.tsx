@@ -85,6 +85,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           )}
         </Link>
+
+        {/* Sale Tag */}
+        <div className="absolute top-4 left-4 z-10">
+          <span className="bg-[#29402E] text-white text-[10px] uppercase tracking-widest px-3 py-1 font-bold shadow-md">
+            Sale
+          </span>
+        </div>
         
         {/* Wishlist Button */}
         <button 
@@ -116,9 +123,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {product.title}
             </h2>
           </Link>
-          <span className="text-[#29402E] text-[13px] md:text-sm font-bold whitespace-nowrap">
-            {formatCurrency(price)}
-          </span>
+          <div className="flex flex-col items-end">
+            <span className="text-[#29402E] text-[13px] md:text-sm font-bold whitespace-nowrap">
+              {formatCurrency(price)}
+            </span>
+            {compareAtPrice > price && (
+              <span className="text-[10px] text-[#5A665D] line-through opacity-60">
+                {formatCurrency(compareAtPrice)}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Color Info & Discount */}

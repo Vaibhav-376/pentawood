@@ -12,33 +12,77 @@ interface ProductImageCarouselProps {
 export function ProductImageCarousel({ images, title }: ProductImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [[page, direction], setPage] = useState([0, 0]);
 
-  const nextImage = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  }, [images.length]);
+  const paginate = useCallback((newDirection: number) => {
+    setPage([page + newDirection, newDirection]);
+    setCurrentIndex((prev) => (prev + newDirection + images.length) % images.length);
+  }, [images.length, page]);
 
-  const prevImage = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  const setIndex = (newIndex: number) => {
+    const newDirection = newIndex > currentIndex ? 1 : -1;
+    setPage([page + newDirection, newDirection]);
+    setCurrentIndex(newIndex);
   };
 
-
+  const nextImage = useCallback(() => paginate(1), [paginate]);
+  const prevImage = useCallback(() => paginate(-1), [paginate]);
 
   if (images.length === 0) return null;
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 100 : -100,
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 100 : -100,
+      opacity: 0
+    })
+  };
+
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
 
   return (
     <div className="relative w-full aspect-[3/4] group">
       <div className="relative w-full h-full overflow-hidden rounded-sm bg-[#F2EFEA]">
-        <AnimatePresence initial={false} mode="wait">
+        <AnimatePresence initial={false} custom={direction}>
           <motion.img
-            key={currentIndex}
+            key={page}
             src={images[currentIndex]}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 }
+            }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={1}
+            onDragEnd={(e, { offset, velocity }) => {
+              const swipe = swipePower(offset.x, velocity.x);
+
+              if (swipe < -swipeConfidenceThreshold) {
+                nextImage();
+              } else if (swipe > swipeConfidenceThreshold) {
+                prevImage();
+              }
+            }}
             alt={`${title} image ${currentIndex + 1}`}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
             onClick={() => setIsLightboxOpen(true)}
-            className="absolute inset-0 w-full h-full object-cover cursor-zoom-in"
+            className="absolute inset-0 w-full h-full object-cover cursor-grab active:cursor-grabbing"
           />
         </AnimatePresence>
       </div>
@@ -66,7 +110,7 @@ export function ProductImageCarousel({ images, title }: ProductImageCarouselProp
             {images.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setCurrentIndex(idx)}
+                onClick={() => setIndex(idx)}
                 className={`w-1.5 h-1.5 rounded-full transition-all ${
                   idx === currentIndex ? "bg-[#2C352D] w-4" : "bg-[#2C352D]/20 hover:bg-[#2C352D]/40"
                 }`}
@@ -80,7 +124,7 @@ export function ProductImageCarousel({ images, title }: ProductImageCarouselProp
             {images.map((img, idx) => (
               <button
                 key={idx}
-                onClick={() => setCurrentIndex(idx)}
+                onClick={() => setIndex(idx)}
                 className={`relative flex-shrink-0 w-20 aspect-[3/4] rounded-sm overflow-hidden border-2 transition-all ${
                   idx === currentIndex ? "border-[#2C352D]" : "border-transparent opacity-60"
                 }`}
@@ -97,7 +141,7 @@ export function ProductImageCarousel({ images, title }: ProductImageCarouselProp
         {images.map((img, idx) => (
           <button
             key={idx}
-            onClick={() => setCurrentIndex(idx)}
+            onClick={() => setIndex(idx)}
             className={`relative w-20 aspect-[3/4] rounded-sm overflow-hidden border transition-all ${
               idx === currentIndex ? "border-[#2C352D] ring-1 ring-[#2C352D]" : "border-[#C5BAA8]/30 opacity-60 hover:opacity-100"
             }`}

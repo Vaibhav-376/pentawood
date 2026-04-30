@@ -104,7 +104,7 @@ export function HeroCarousel() {
   const currentSlide = HERO_SLIDES[current] || HERO_SLIDES[0];
 
   return (
-    <section className="relative h-[90vh] w-full overflow-hidden">
+    <section className="relative h-[70vh] w-full overflow-hidden">
       <AnimatePresence initial={false}>
         <motion.div
           key={current}

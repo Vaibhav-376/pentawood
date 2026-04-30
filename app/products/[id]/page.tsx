@@ -35,14 +35,26 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const priceAmount = productData.priceRange?.minVariantPrice?.amount;
   const currency = productData.priceRange?.minVariantPrice?.currencyCode || 'USD';
   
-  const formattedPrice = priceAmount 
-    ? new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(parseFloat(priceAmount))
-    : '₹0';
+  const firstVariant = productData.variants?.edges?.[0]?.node;
+  const compareAtPriceAmount = firstVariant?.compareAtPrice?.amount;
+
+  const formatPrice = (amount: string) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(parseFloat(amount));
+  };
+
+  const formattedPrice = priceAmount ? formatPrice(priceAmount) : '₹0';
+  const formattedComparePrice = compareAtPriceAmount && parseFloat(compareAtPriceAmount) > parseFloat(priceAmount) 
+    ? formatPrice(compareAtPriceAmount) 
+    : null;
+
+  const discount = formattedComparePrice 
+    ? Math.round(((parseFloat(compareAtPriceAmount) - parseFloat(priceAmount)) / parseFloat(compareAtPriceAmount)) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] pt-28 pb-24 text-[#2C352D]">
@@ -62,10 +74,27 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </div>
 
           <div className="md:sticky md:top-32 self-start h-fit mb-12">
+            <div className="mb-4">
+              <span className="bg-[#29402E] text-white text-[10px] uppercase tracking-widest px-3 py-1 font-bold">
+                Sale
+              </span>
+            </div>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-light mb-4 text-[#2C352D] tracking-tight">
               {title}
             </h1>
-            <p className="text-2xl font-light text-[#2C352D] mb-8">{formattedPrice}</p>
+            <div className="flex items-center gap-4 mb-8">
+              <span className="text-3xl font-light text-[#2C352D]">{formattedPrice}</span>
+              {formattedComparePrice && (
+                <>
+                  <span className="text-lg text-[#5A665D] line-through opacity-50 font-light">
+                    {formattedComparePrice}
+                  </span>
+                  <span className="bg-[#29402E] text-white text-[10px] px-2 py-1 uppercase tracking-widest font-bold">
+                    Save {discount}%
+                  </span>
+                </>
+              )}
+            </div>
             
             <div 
               className="text-[#5A665D] font-light leading-relaxed mb-10 tracking-wide prose prose-p:mb-4 prose-a:text-[#2C352D] prose-a:underline prose-li:mb-2 max-w-none"
