@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "./AddToCartButton";
+import { ProductImageCarousel } from "./ProductImageCarousel";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,31 +29,20 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     images.push("https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=800"); 
   }
 
-  const sizeOption = productData.options?.find((o: any) => o.name.toLowerCase() === "size");
-  const sizes = sizeOption?.values || [];
-
-  // Build a mapped lookup table of specific size selections directly routing to specific Shopify variant GIDs
-  const variantMap: Record<string, string> = {};
-  productData.variants?.edges?.forEach(({ node }: any) => {
-    const sizeVal = node.selectedOptions?.find((opt: any) => opt.name.toLowerCase() === "size")?.value;
-    if (sizeVal) {
-      variantMap[sizeVal] = node.id;
-    } else {
-      variantMap["Default Title"] = node.id; 
-    }
-  });
+  const options = productData.options || [];
+  const variants = productData.variants?.edges?.map((edge: any) => edge.node) || [];
 
   const priceAmount = productData.priceRange?.minVariantPrice?.amount;
   const currency = productData.priceRange?.minVariantPrice?.currencyCode || 'USD';
   
   const formattedPrice = priceAmount 
-    ? new Intl.NumberFormat('en-US', {
+    ? new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: currency,
         minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 0,
       }).format(parseFloat(priceAmount))
-    : '$0.00';
+    : '₹0';
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] pt-28 pb-24 text-[#2C352D]">
@@ -67,18 +57,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 relative mt-12">
           
-          <div className="space-y-4 md:space-y-6">
-            {images.map((img: string, idx: number) => (
-              <div key={idx} className="bg-[#F2EFEA] relative aspect-[3/4] overflow-hidden rounded-sm">
-                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={img} 
-                  alt={`${title} image ${idx + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading={idx === 0 ? "eager" : "lazy"}
-                />
-              </div>
-            ))}
+          <div className="relative">
+            <ProductImageCarousel images={images} title={title} />
           </div>
 
           <div className="md:sticky md:top-32 self-start h-fit mb-12">
@@ -93,7 +73,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             />
 
             {/* Injected Client Side Component for Interaction & React State mapped to Cart Store */}
-            <AddToCartButton variantMap={variantMap} sizes={sizes} />
+            <AddToCartButton options={options} variants={variants} />
 
             <p className="text-center text-xs text-[#5A665D] uppercase tracking-widest">
               Free shipping on orders over $150

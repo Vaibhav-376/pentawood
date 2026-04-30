@@ -62,8 +62,8 @@ export default async function RootLayout({
       >
         <CartProvider>
           <Navbar collections={collections} menu={menu} customerName={customerName} />
-          <CartDrawer />
-          <main className="flex-grow pt-24 md:pt-28">
+          <CartDrawer isLoggedIn={!!token} />
+          <main className="flex-grow pt-14 md:pt-16">
             {children}
           </main>
           <Footer />

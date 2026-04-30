@@ -426,3 +426,28 @@ query getMenu($handle: String!) {
   }
 }
 `;
+
+export const searchProductsQuery = `
+query SearchProducts($query: String!) {
+  products(first: 24, query: $query) {
+    edges {
+      node {
+        id
+        title
+        handle
+        description
+        featuredImage {
+          url
+          altText
+        }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
+}
+`;

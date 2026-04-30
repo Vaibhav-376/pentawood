@@ -109,58 +109,40 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Metadata */}
-      <div className="flex flex-col">
-        {/* Color Swatches */}
-        {colorValues.length > 0 && (
-          <div className="flex gap-1.5 mb-3">
-            {colorValues.slice(0, 4).map((color: string, idx: number) => {
-              const hex = COLOR_MAP[color.toLowerCase()] || '#E2E2E2';
-              return (
-                <div 
-                  key={idx}
-                  className="w-3.5 h-3.5 rounded-full border border-gray-200 shadow-sm"
-                  style={{ backgroundColor: hex }}
-                  title={color}
-                />
-              );
-            })}
-            {colorValues.length > 4 && (
-              <span className="text-[10px] text-gray-500 font-medium ml-1">
-                +{colorValues.length - 4}
-              </span>
-            )}
-          </div>
-        )}
-
-        <Link href={`/products/${product.handle}`}>
-          <h2 className="text-gray-800 text-sm font-medium mb-1 line-clamp-1 group-hover:text-gray-600 transition-colors">
-            {product.title}
-          </h2>
-        </Link>
-
-        {/* Price Info */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-bold text-gray-900">
+      <div className="flex flex-col pt-3">
+        <div className="flex justify-between items-start gap-2 mb-1.5">
+          <Link href={`/products/${product.handle}`} className="flex-1">
+            <h2 className="text-[#29402E] text-[13px] md:text-sm font-medium line-clamp-2 uppercase tracking-wide">
+              {product.title}
+            </h2>
+          </Link>
+          <span className="text-[#29402E] text-[13px] md:text-sm font-bold whitespace-nowrap">
             {formatCurrency(price)}
           </span>
+        </div>
+
+        {/* Color Info & Discount */}
+        <div className="flex items-center justify-between mt-auto">
+          <div className="flex items-center gap-1.5">
+            {colorValues.length > 0 && (
+              <div className="flex items-center">
+                <div 
+                  className="w-2.5 h-2.5 rounded-full border border-gray-200 mr-2"
+                  style={{ backgroundColor: COLOR_MAP[colorValues[0].toLowerCase()] || '#E2E2E2' }}
+                />
+                <span className="text-[10px] text-[#5A665D] uppercase tracking-widest font-medium">
+                  {colorValues.length} {colorValues.length === 1 ? 'Colour' : 'Colours'}
+                </span>
+              </div>
+            )}
+          </div>
+          
           {discount > 0 && (
-            <>
-              <span className="text-xs text-gray-400 line-through">
-                {formatCurrency(compareAtPrice)}
-              </span>
-              <span className="text-xs font-bold text-red-500">
-                {discount}% OFF
-              </span>
-            </>
+            <span className="text-[10px] font-bold text-red-500 uppercase tracking-tighter">
+              -{discount}%
+            </span>
           )}
         </div>
-        
-        {/* Subtext info like in Image 1 */}
-        {discount > 0 && (
-          <p className="text-[10px] text-gray-400 italic mt-1 font-medium px-1 border-l-2 border-gray-100">
-            GST Benefit Included
-          </p>
-        )}
       </div>
     </div>
   );

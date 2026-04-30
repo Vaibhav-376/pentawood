@@ -2,8 +2,9 @@
 import { useCart } from "@/lib/cart-context";
 import { X, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
-export function CartDrawer() {
+export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
   const { cart, isCartOpen, closeCart, removeItemFromCart, isLoading } = useCart();
 
   return (
@@ -91,12 +92,28 @@ export function CartDrawer() {
                   <span className="text-[#5A665D] uppercase tracking-widest text-xs font-medium">Subtotal</span>
                   <span className="text-xl font-medium text-[#2C352D]">${cart.cost.subtotalAmount.amount}</span>
                 </div>
-                <a 
-                  href={cart.checkoutUrl} 
-                  className="w-full bg-[#2C352D] hover:bg-black text-white text-center py-5 uppercase tracking-[0.2em] text-xs font-medium transition-colors block rounded-sm shadow-md"
-                >
-                  Checkout
-                </a>
+                
+                {isLoggedIn ? (
+                  <a 
+                    href={cart.checkoutUrl} 
+                    className="w-full bg-[#2C352D] hover:bg-black text-white text-center py-5 uppercase tracking-[0.2em] text-xs font-medium transition-colors block rounded-sm shadow-md"
+                  >
+                    Checkout
+                  </a>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-[10px] text-center text-red-600 uppercase tracking-widest font-medium">
+                      Please sign in to complete your purchase
+                    </p>
+                    <Link 
+                      href="/login" 
+                      onClick={closeCart}
+                      className="w-full bg-[#2C352D] hover:bg-black text-white text-center py-5 uppercase tracking-[0.2em] text-xs font-medium transition-colors block rounded-sm shadow-md"
+                    >
+                      Sign In to Checkout
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </motion.div>
