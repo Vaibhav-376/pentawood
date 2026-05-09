@@ -8,7 +8,10 @@ import { useCart } from "@/lib/cart-context";
 import { useDebounce } from "@/hooks/use-debounce";
 import Image from "next/image";
 
+import { useRouter } from "next/navigation";
+
 export function Navbar({ collections = [], menu, customerName }: { collections: any[], menu?: any, customerName?: string | null }) {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -21,12 +24,17 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
   const cartCount = cart?.totalQuantity || 0;
 
   useEffect(() => {
-    // When debounced search query changes, we could trigger a search or navigate
     if (debouncedSearchQuery) {
-      console.log("Searching for:", debouncedSearchQuery);
-      // Example: router.push(`/search?q=${debouncedSearchQuery}`);
+      router.push(`/search?q=${encodeURIComponent(debouncedSearchQuery)}`);
     }
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, router]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,13 +69,16 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
     }));
   };
 
-  const navItems = menu?.items?.length > 0 ? menu.items : [
+  const navItems = (menu?.items?.length > 0 ? menu.items : [
     { title: "Men", url: "/collections/men" },
     { title: "Women", url: "/collections/women" },
     { title: "Sale", url: "/collections/sale" },
     { title: "New Arrivals", url: "/collections/new-arrivals" },
     { title: "Collection", url: "/collections" }
-  ];
+  ]).map((item: any) => ({
+    ...item,
+    url: item.url?.replace(/^https?:\/\/[^\/]+/, '') || `/collections/${item.title.toLowerCase().replace(' ', '-')}`
+  }));
 
   return (
     <>
@@ -101,7 +112,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
                     onMouseEnter={() => hasDropdown && setActiveDropdown(item.title)}
                   >
                     <Link
-                      href={item.url || `/collections/${item.title.toLowerCase().replace(' ', '-')}`}
+                      href={item.url}
                       className={`hover:text-[#29402E] transition-colors cursor-pointer py-2 block ${activeDropdown === item.title ? "text-[#29402E]" : ""
                         }`}
                     >
@@ -130,7 +141,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
                             ))}
                             <div className="pt-4 mt-2 border-t border-[#C5BAA8]/30">
                               <Link
-                                href={item.url || "/collections"}
+                                href={item.url}
                                 className="text-[#29402E] font-medium text-[11px] uppercase tracking-widest hover:text-[#5A665D] transition-colors"
                               >
                                 Explore All {item.title}
@@ -166,7 +177,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
               <Link href="/search" className="md:hidden hover:text-[#29402E] transition-colors">
                 <Search className="w-5 h-5" strokeWidth={1.5} />
               </Link>
-              <div className="hidden md:flex items-center bg-[#F2EFEA]/30 border border-[#C5BAA8]/20 px-3 py-1 rounded-sm">
+              <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center bg-[#F2EFEA]/30 border border-[#C5BAA8]/20 px-3 py-1 rounded-sm">
                 <input
                   type="text"
                   placeholder="SEARCH..."
@@ -174,7 +185,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-transparent text-[10px] uppercase tracking-[0.15em] font-medium placeholder:text-[#5A665D]/50 outline-none w-[80px] focus:w-[120px] transition-all duration-300"
                 />
-              </div>
+              </form>
             </div>
 
             {/* Account - Icon on mobile, Text on desktop */}
@@ -236,7 +247,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
                   <div key={item.id || item.title} className="flex flex-col border-b border-[#C5BAA8]/20 overflow-hidden">
                     <div className="flex items-center justify-between py-5">
                       <Link
-                        href={item.url || `/collections/${item.title.toLowerCase()}`}
+                        href={item.url}
                         onClick={() => setMobileMenuOpen(false)}
                         className="text-lg font-serif text-[#29402E] uppercase tracking-wide"
                       >
@@ -291,7 +302,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
 
             <div className="mt-auto py-8 border-t border-[#C5BAA8]/20 flex flex-col gap-8">
               {/* Search Bar in Mobile Menu */}
-              <div className="flex items-center bg-[#F2EFEA] border border-[#C5BAA8]/20 px-4 py-3 rounded-sm">
+              <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#F2EFEA] border border-[#C5BAA8]/20 px-4 py-3 rounded-sm">
                 <input
                   type="text"
                   placeholder="SEARCH PRODUCTS..."
@@ -299,16 +310,15 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-transparent text-[11px] uppercase tracking-[0.2em] font-medium placeholder:text-[#5A665D]/50 outline-none w-full"
                 />
-                <Link 
-                  href={`/search?q=${searchQuery}`} 
-                  onClick={() => setMobileMenuOpen(false)}
+                <button 
+                  type="submit"
                   className="p-1 hover:text-[#29402E] transition-colors"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
                   </svg>
-                </Link>
-              </div>
+                </button>
+              </form>
 
               <div className="grid grid-cols-2 gap-4">
                 {customerName ? (
