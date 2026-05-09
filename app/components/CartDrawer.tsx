@@ -45,7 +45,7 @@ export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  {cart.lines.edges.map(({ node }: any) => {
+                  {cart.lines?.edges?.map(({ node }: any) => {
                     const product = node.merchandise.product;
                     const variantTitle = node.merchandise.title !== "Default Title" ? node.merchandise.title : "";
                     return (

@@ -2,8 +2,13 @@
 import { shopifyFetch } from "@/lib/shopify";
 import { createCartMutation, addToCartMutation, getCartQuery, removeFromCartMutation } from "@/lib/queries";
 
-export async function createCart() {
-  const data = await shopifyFetch(createCartMutation, { input: {} });
+export async function createCart(lines: any[] = []) {
+  const data = await shopifyFetch(createCartMutation, { 
+    input: { lines } 
+  });
+  if (data?.cartCreate?.userErrors?.length > 0) {
+    throw new Error(data.cartCreate.userErrors[0].message);
+  }
   return data?.cartCreate?.cart;
 }
 
@@ -15,20 +20,25 @@ export async function getCart(cartId: string) {
 export async function addToCart(cartId: string | null, variantId: string, quantity: number = 1) {
   let activeCartId = cartId;
   
-  // Create cart if one doesn't exist locally
-  if (!activeCartId) {
-     const cart = await createCart();
-     activeCartId = cart?.id;
+  // If no cart exists, create one with the item already in it
+  if (!activeCartId || activeCartId === "null" || activeCartId === "undefined") {
+     const cart = await createCart([{ merchandiseId: variantId, quantity }]);
+     return cart;
   }
   
-  if (!activeCartId) {
-     throw new Error("Unable to create cart");
-  }
-
   const data = await shopifyFetch(addToCartMutation, {
     cartId: activeCartId,
     lines: [{ merchandiseId: variantId, quantity }],
   });
+  
+  if (data?.cartLinesAdd?.userErrors?.length > 0) {
+    // If the cart expired or was deleted, try creating a new one
+    if (data.cartLinesAdd.userErrors[0].message.toLowerCase().includes("not found") || 
+        data.cartLinesAdd.userErrors[0].message.toLowerCase().includes("expired")) {
+      return await createCart([{ merchandiseId: variantId, quantity }]);
+    }
+    throw new Error(data.cartLinesAdd.userErrors[0].message);
+  }
   
   return data?.cartLinesAdd?.cart;
 }

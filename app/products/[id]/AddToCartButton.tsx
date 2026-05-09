@@ -1,6 +1,6 @@
 "use client";
 import { useCart } from "@/lib/cart-context";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 interface Option {
   id: string;
@@ -11,6 +11,9 @@ interface Option {
 interface Variant {
   id: string;
   title: string;
+  image?: {
+    url: string;
+  };
   selectedOptions: {
     name: string;
     value: string;
@@ -40,24 +43,23 @@ const COLOR_MAP: Record<string, string> = {
   mustard: "#FFDB58",
 };
 
-export function AddToCartButton({ options, variants }: { options: Option[], variants: Variant[] }) {
-  const { addItemToCart, isLoading } = useCart();
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {};
-    options.forEach(option => {
-      initial[option.name] = option.values[0];
-    });
-    return initial;
-  });
-  const [isAdding, setIsAdding] = useState(false);
+interface AddToCartButtonProps {
+  options: Option[];
+  variants: Variant[];
+  selectedOptions: Record<string, string>;
+  setSelectedOptions: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  selectedVariant: Variant | undefined;
+}
 
-  const selectedVariant = useMemo(() => {
-    return variants.find(variant => {
-      return variant.selectedOptions.every(
-        option => selectedOptions[option.name] === option.value
-      );
-    });
-  }, [variants, selectedOptions]);
+export function AddToCartButton({ 
+  options, 
+  variants, 
+  selectedOptions, 
+  setSelectedOptions, 
+  selectedVariant 
+}: AddToCartButtonProps) {
+  const { addItemToCart, isLoading } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleAdd = async () => {
     if (!selectedVariant) return;

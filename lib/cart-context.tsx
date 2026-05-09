@@ -39,11 +39,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addItemToCart = async (variantId: string, quantity = 1) => {
+    console.log("Adding to cart:", { variantId, quantity });
     setIsLoading(true);
     const storedCartId = localStorage.getItem("shopify_cart_id");
     
     try {
       const updatedCart = await addToCart(storedCartId, variantId, quantity);
+      console.log("Updated cart response:", updatedCart);
       if (updatedCart) {
         setCart(updatedCart);
         localStorage.setItem("shopify_cart_id", updatedCart.id);

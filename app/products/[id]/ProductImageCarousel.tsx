@@ -7,12 +7,25 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 interface ProductImageCarouselProps {
   images: string[];
   title: string;
+  selectedVariantImage?: string;
 }
 
-export function ProductImageCarousel({ images, title }: ProductImageCarouselProps) {
+export function ProductImageCarousel({ images, title, selectedVariantImage }: ProductImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [[page, direction], setPage] = useState([0, 0]);
+
+  // Update carousel when selected variant image changes
+  useEffect(() => {
+    if (selectedVariantImage) {
+      const index = images.findIndex(img => img === selectedVariantImage);
+      if (index !== -1 && index !== currentIndex) {
+        const newDirection = index > currentIndex ? 1 : -1;
+        setPage([page + newDirection, newDirection]);
+        setCurrentIndex(index);
+      }
+    }
+  }, [selectedVariantImage, images, currentIndex, page]);
 
   const paginate = useCallback((newDirection: number) => {
     setPage([page + newDirection, newDirection]);

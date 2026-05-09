@@ -1,5 +1,5 @@
 const domain = process.env.SHOPIFY_STORE_DOMAIN || "";
-const apiVersion = process.env.SHOPIFY_API_VERSION || "2026-01";
+const apiVersion = process.env.SHOPIFY_API_VERSION || "2024-04";
 const token = process.env.SHOPIFY_STOREFRONT_TOKEN || "";
 
 export async function shopifyFetch(query: string, variables = {}) {

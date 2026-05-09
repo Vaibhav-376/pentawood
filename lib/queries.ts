@@ -175,6 +175,9 @@ query GetProduct($handle: String!) {
             name
             value
           }
+          image {
+            url
+          }
           price {
             amount
             currencyCode
@@ -271,6 +274,10 @@ mutation cartCreate($input: CartInput) {
         }
       }
     }
+    userErrors {
+      field
+      message
+    }
   }
 }
 `;
@@ -315,6 +322,10 @@ mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
           }
         }
       }
+    }
+    userErrors {
+      field
+      message
     }
   }
 }
