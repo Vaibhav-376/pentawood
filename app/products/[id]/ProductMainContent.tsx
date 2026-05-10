@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ProductImageCarousel } from "./ProductImageCarousel";
 import { AddToCartButton, type Option, type Variant } from "./AddToCartButton";
 
@@ -25,6 +26,7 @@ export function ProductMainContent({
   discount,
   descriptionHtml
 }: ProductMainContentProps) {
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     options.forEach(option => {
@@ -92,19 +94,61 @@ export function ProductMainContent({
           selectedVariant={selectedVariant}
         />
 
-        <p className="text-center text-xs text-[#5A665D] uppercase tracking-widest">
-          Free shipping on orders over $150
-        </p>
-        
         <div className="mt-16 border-t border-[#C5BAA8]/50">
-          <div className="py-6 border-b border-[#C5BAA8]/50 flex justify-between items-center cursor-pointer group">
-            <span className="uppercase text-xs tracking-widest font-medium text-[#5A665D] group-hover:text-[#2C352D] transition-colors">Details & Care</span>
-            <span className="text-xl font-light text-[#5A665D] group-hover:text-[#2C352D]">+</span>
-          </div>
-          <div className="py-6 border-b border-[#C5BAA8]/50 flex justify-between items-center cursor-pointer group">
-            <span className="uppercase text-xs tracking-widest font-medium text-[#5A665D] group-hover:text-[#2C352D] transition-colors">Shipping & Returns</span>
-            <span className="text-xl font-light text-[#5A665D] group-hover:text-[#2C352D]">+</span>
-          </div>
+          {[
+            { 
+              id: "details", 
+              title: "Details & Care", 
+              content: (
+                <div className="space-y-4 text-sm font-light leading-relaxed text-[#5A665D]">
+                  <p>Our premium garments are crafted from 100% GOTS certified organic cotton, ensuring both exceptional comfort and a reduced environmental footprint.</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Machine wash cold with like colors</li>
+                    <li>Tumble dry low or line dry in shade</li>
+                    <li>Iron on low heat if necessary</li>
+                    <li>Do not bleach</li>
+                  </ul>
+                </div>
+              )
+            },
+            { 
+              id: "shipping", 
+              title: "Shipping & Returns", 
+              content: (
+                <div className="space-y-4 text-sm font-light leading-relaxed text-[#5A665D]">
+                  <p>We offer standard shipping on all orders. Most orders are processed within 1-2 business days.</p>
+                  <p>If you are not entirely satisfied with your purchase, we offer easy 30-day returns and exchanges. Items must be in their original condition with all tags attached.</p>
+                </div>
+              )
+            }
+          ].map((section) => (
+            <div key={section.id} className="border-b border-[#C5BAA8]/50">
+              <button 
+                onClick={() => setOpenAccordion(openAccordion === section.id ? null : section.id)}
+                className="w-full py-6 flex justify-between items-center cursor-pointer group"
+              >
+                <span className="uppercase text-xs tracking-[0.2em] font-bold text-[#5A665D] group-hover:text-[#2C352D] transition-colors">{section.title}</span>
+                <span className={`text-xl font-light text-[#5A665D] transition-transform duration-300 ${openAccordion === section.id ? 'rotate-45' : ''}`}>
+                  {openAccordion === section.id ? '×' : '+'}
+                </span>
+              </button>
+              <AnimatePresence>
+                {openAccordion === section.id && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pb-8">
+                      {section.content}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   
   const price = parseFloat(firstVariant?.price?.amount || priceRange?.amount || "0");
   const compareAtPrice = parseFloat(firstVariant?.compareAtPrice?.amount || "0");
-  const currency = firstVariant?.price?.currencyCode || priceRange?.currencyCode || 'INR';
+  const currency = 'INR';
 
   const firstImage = product.images?.edges?.[0]?.node?.url || product.featuredImage?.url;
   const secondImage = product.images?.edges?.[1]?.node?.url;

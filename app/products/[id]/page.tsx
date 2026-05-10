@@ -40,7 +40,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const formatPrice = (amount: string) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: currency,
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(parseFloat(amount));

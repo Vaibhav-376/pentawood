@@ -51,7 +51,7 @@ export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
                     const formatCurrency = (amount: string | number, currencyCode: string) => {
                       return new Intl.NumberFormat('en-IN', {
                         style: 'currency',
-                        currency: currencyCode,
+                        currency: 'INR',
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0,
                       }).format(Number(amount));
@@ -104,7 +104,7 @@ export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <span className="text-xl font-medium text-[#2C352D]">
                     {new Intl.NumberFormat('en-IN', {
                       style: 'currency',
-                      currency: cart.cost.subtotalAmount.currencyCode,
+                      currency: 'INR',
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 0,
                     }).format(Number(cart.cost.subtotalAmount.amount))}
@@ -112,11 +112,11 @@ export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </div>
                 
                 <Link 
-                  href="/checkout" 
+                  href={isLoggedIn ? "/checkout" : "/login?redirect=/checkout"} 
                   onClick={closeCart}
                   className="w-full bg-[#2C352D] hover:bg-black text-white text-center py-5 uppercase tracking-[0.2em] text-xs font-medium transition-colors block rounded-sm shadow-md"
                 >
-                  Proceed to Checkout
+                  {isLoggedIn ? "Proceed to Checkout" : "Login to Checkout"}
                 </Link>
               </div>
             )}

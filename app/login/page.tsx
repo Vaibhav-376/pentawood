@@ -3,21 +3,72 @@
 import { useActionState, useEffect } from "react";
 import { loginCustomer } from "@/app/actions/auth";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 // Basic shim to prevent build errors with React 19's useActionState if older React is used
 // Next 15 App Router standardizes on useActionState over useFormState
 const useFormStateFixed = typeof useActionState === 'function' ? useActionState : require('react-dom').useFormState;
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, formAction, isPending] = useFormStateFixed(loginCustomer, null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/account";
 
   useEffect(() => {
     if (state?.success) {
-      router.push("/account");
+      router.push(redirectTo);
     }
-  }, [state, router]);
+  }, [state, router, redirectTo]);
+
+  return (
+    <form action={formAction} className="space-y-6">
+      {state?.error && (
+        <div className="bg-red-50 text-red-600 p-4 border border-red-100 text-xs uppercase tracking-widest text-center">
+          {state.error}
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <label className="text-xs uppercase tracking-widest text-[#5A665D]">Email</label>
+        <input
+          type="email"
+          name="email"
+          required
+          className="w-full border-b border-[#C5BAA8]/50 bg-transparent py-3 focus:outline-none focus:border-[#2C352D] transition-colors font-light text-[#2C352D]"
+          placeholder="Enter your email"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex justify-between items-end">
+          <label className="text-xs uppercase tracking-widest text-[#5A665D]">Password</label>
+          <Link href="#" className="text-[10px] uppercase tracking-widest text-[#5A665D] hover:text-[#2C352D] transition-colors">
+            Forgot Password?
+          </Link>
+        </div>
+        <input
+          type="password"
+          name="password"
+          required
+          className="w-full border-b border-[#C5BAA8]/50 bg-transparent py-3 focus:outline-none focus:border-[#2C352D] transition-colors font-light text-[#2C352D]"
+          placeholder="Enter your password"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={isPending}
+        className="w-full bg-[#2C352D] hover:bg-black text-white py-5 text-xs uppercase tracking-[0.2em] font-medium transition-colors mt-8 disabled:opacity-50"
+      >
+        {isPending ? "Signing In..." : "Sign In"}
+      </button>
+    </form>
+  );
+}
+
+export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center py-32 px-6">
@@ -29,48 +80,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form action={formAction} className="space-y-6">
-          {state?.error && (
-            <div className="bg-red-50 text-red-600 p-4 border border-red-100 text-xs uppercase tracking-widest text-center">
-              {state.error}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <label className="text-xs uppercase tracking-widest text-[#5A665D]">Email</label>
-            <input
-              type="email"
-              name="email"
-              required
-              className="w-full border-b border-[#C5BAA8]/50 bg-transparent py-3 focus:outline-none focus:border-[#2C352D] transition-colors font-light text-[#2C352D]"
-              placeholder="Enter your email"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between items-end">
-              <label className="text-xs uppercase tracking-widest text-[#5A665D]">Password</label>
-              <Link href="#" className="text-[10px] uppercase tracking-widest text-[#5A665D] hover:text-[#2C352D] transition-colors">
-                Forgot Password?
-              </Link>
-            </div>
-            <input
-              type="password"
-              name="password"
-              required
-              className="w-full border-b border-[#C5BAA8]/50 bg-transparent py-3 focus:outline-none focus:border-[#2C352D] transition-colors font-light text-[#2C352D]"
-              placeholder="Enter your password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-[#2C352D] hover:bg-black text-white py-5 text-xs uppercase tracking-[0.2em] font-medium transition-colors mt-8 disabled:opacity-50"
-          >
-            {isPending ? "Signing In..." : "Sign In"}
-          </button>
-        </form>
+        <Suspense fallback={<div className="py-12 text-center text-xs uppercase tracking-widest text-[#5A665D]">Loading...</div>}>
+          <LoginForm />
+        </Suspense>
 
         <div className="mt-12 text-center">
           <p className="text-[#5A665D] text-xs uppercase tracking-widest">
