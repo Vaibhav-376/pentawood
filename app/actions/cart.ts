@@ -48,5 +48,10 @@ export async function removeFromCart(cartId: string, lineId: string) {
     cartId,
     lineIds: [lineId],
   });
+  
+  if (data?.cartLinesRemove?.userErrors?.length > 0) {
+    throw new Error(data.cartLinesRemove.userErrors[0].message);
+  }
+  
   return data?.cartLinesRemove?.cart;
 }

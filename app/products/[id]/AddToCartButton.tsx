@@ -2,46 +2,26 @@
 import { useCart } from "@/lib/cart-context";
 import { useState } from "react";
 
-interface Option {
+export interface Option {
   id: string;
   name: string;
   values: string[];
 }
 
-interface Variant {
+export interface Variant {
   id: string;
   title: string;
   image?: {
     url: string;
   };
+  availableForSale: boolean;
   selectedOptions: {
     name: string;
     value: string;
   }[];
 }
 
-const COLOR_MAP: Record<string, string> = {
-  black: "#000000",
-  white: "#FFFFFF",
-  navy: "#000080",
-  blue: "#2443ED",
-  red: "#FF0000",
-  green: "#008000",
-  yellow: "#FFFF00",
-  grey: "#808080",
-  gray: "#808080",
-  beige: "#F5F5DC",
-  brown: "#A52A2A",
-  pink: "#FFC0CB",
-  purple: "#800080",
-  orange: "#FFA500",
-  charcoal: "#36454F",
-  olive: "#808000",
-  maroon: "#800000",
-  teal: "#008080",
-  burgundy: "#800020",
-  mustard: "#FFDB58",
-};
+import { getColorHex } from "@/lib/colors";
 
 interface AddToCartButtonProps {
   options: Option[];
@@ -88,7 +68,8 @@ export function AddToCartButton({
                 const isSelected = selectedOptions[option.name] === value;
                 
                 if (isColor) {
-                  const hex = COLOR_MAP[value.toLowerCase()] || "#E2E2E2";
+                  const hex = getColorHex(value);
+                  console.log(`Color Mapping: "${value}" -> ${hex}`);
                   return (
                     <button
                       key={value}
@@ -101,7 +82,13 @@ export function AddToCartButton({
                       <div 
                         className="w-full h-full rounded-full border border-black/10 shadow-inner" 
                         style={{ backgroundColor: hex }}
-                      />
+                      >
+                        {hex === "#E2E2E2" && (
+                          <span className="text-[10px] font-bold text-[#5A665D] uppercase opacity-60">
+                            {value.charAt(0)}
+                          </span>
+                        )}
+                      </div>
                     </button>
                   );
                 }
@@ -127,10 +114,16 @@ export function AddToCartButton({
 
       <button 
         onClick={handleAdd}
-        disabled={isAdding || isLoading || !selectedVariant}
+        disabled={isAdding || isLoading || !selectedVariant || !selectedVariant.availableForSale}
         className="w-full bg-[#29402E] text-white py-5 uppercase tracking-[0.2em] text-xs font-medium hover:bg-black transition-all rounded-sm shadow-md disabled:opacity-50 mt-4"
       >
-        {isAdding ? "Adding..." : selectedVariant ? "Add to Cart" : "Unavailable"}
+        {isAdding 
+          ? "Adding..." 
+          : !selectedVariant 
+            ? "Select Options" 
+            : !selectedVariant.availableForSale 
+              ? "Unavailable" 
+              : "Add to Cart"}
       </button>
     </div>
   );

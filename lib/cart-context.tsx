@@ -59,20 +59,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeItemFromCart = async (lineId: string) => {
+    console.log("Removing item from cart:", lineId);
     setIsLoading(true);
     const storedCartId = localStorage.getItem("shopify_cart_id");
     if (!storedCartId) return;
 
     try {
       const updatedCart = await removeFromCart(storedCartId, lineId);
+      console.log("Cart after removal:", updatedCart);
       if (updatedCart) {
         setCart(updatedCart);
       }
     } catch(err) {
-      console.error("Failed executing remove from cart action", err);
+      console.error("Failed removing item", err);
+      alert("Failed to remove item: " + (err instanceof Error ? err.message : "Unknown error"));
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

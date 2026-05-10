@@ -56,8 +56,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     : 0;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pt-28 pb-24 text-[#2C352D]">
-      <div className="px-6 md:px-12 py-4 border-b border-[#C5BAA8]/30 mb-8 flex items-center text-xs uppercase tracking-widest text-[#5A665D] max-w-[1400px] mx-auto">
+    <div className="min-h-screen bg-[#FDFBF7] pt-8 pb-24 text-[#2C352D]">
+      <div className="px-6 md:px-12 py-2 border-b border-[#C5BAA8]/30 mb-4 flex items-center text-xs uppercase tracking-widest text-[#5A665D] max-w-[1400px] mx-auto">
         <Link href="/" className="hover:text-[#2C352D] transition-colors">Home</Link>
         <ChevronRight className="w-4 h-4 mx-2 opacity-50" />
         <Link href="/collections" className="hover:text-[#2C352D] transition-colors">Collections</Link>

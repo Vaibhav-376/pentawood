@@ -100,11 +100,17 @@ export function HeroCarousel() {
   }, []);
 
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
 
   const currentSlide = HERO_SLIDES[current] || HERO_SLIDES[0];
 
   return (
-    <section className="relative h-[70vh] w-full overflow-hidden">
+    <section className="relative h-[60vh] w-full overflow-hidden">
       <AnimatePresence initial={false}>
         <motion.div
           key={current}
@@ -128,6 +134,7 @@ export function HeroCarousel() {
               fill
               className="object-cover object-center"
               priority
+              unoptimized={currentSlide.bgImage.startsWith('/')}
             />
           </motion.div>
 

@@ -1,8 +1,23 @@
+import { redis } from "./redis";
+
 const domain = process.env.SHOPIFY_STORE_DOMAIN || "";
 const apiVersion = process.env.SHOPIFY_API_VERSION || "2024-04";
 const token = process.env.SHOPIFY_STOREFRONT_TOKEN || "";
 
-export async function shopifyFetch(query: string, variables = {}) {
+export async function shopifyFetch(query: string, variables = {}, cacheKey?: string, ttl: number = 3600) {
+  // Try to get from Redis cache first if cacheKey is provided
+  if (cacheKey) {
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        console.log(`Cache Hit: ${cacheKey}`);
+        return cached;
+      }
+    } catch (e) {
+      console.warn("Redis cache error:", e);
+    }
+  }
+
   const res = await fetch(`https://${domain}/api/${apiVersion}/graphql.json`, {
     method: "POST",
     headers: {
@@ -24,5 +39,17 @@ export async function shopifyFetch(query: string, variables = {}) {
     );
   }
 
-  return json.data;
+  const data = json.data;
+
+  // Store in Redis if cacheKey is provided
+  if (cacheKey && data) {
+    try {
+      await redis.set(cacheKey, data, { ex: ttl });
+      console.log(`Cache Set: ${cacheKey}`);
+    } catch (e) {
+      console.warn("Redis cache set error:", e);
+    }
+  }
+
+  return data;
 }

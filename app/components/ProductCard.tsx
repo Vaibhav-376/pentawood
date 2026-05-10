@@ -8,34 +8,15 @@ interface ProductCardProps {
   product: any;
 }
 
-const COLOR_MAP: Record<string, string> = {
-  black: "#000000",
-  white: "#FFFFFF",
-  navy: "#000080",
-  blue: "#2443ED",
-  red: "#FF0000",
-  green: "#008000",
-  yellow: "#FFFF00",
-  grey: "#808080",
-  gray: "#808080",
-  beige: "#F5F5DC",
-  brown: "#A52A2A",
-  pink: "#FFC0CB",
-  purple: "#800080",
-  orange: "#FFA500",
-  charcoal: "#36454F",
-  olive: "#808000",
-  maroon: "#800000",
-  teal: "#008080",
-  burgundy: "#800020",
-  mustard: "#FFDB58",
-};
+import { getColorHex } from "@/lib/colors";
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const firstVariant = product.variants?.edges[0]?.node;
-  const price = parseFloat(firstVariant?.price?.amount || "0");
+  const firstVariant = product.variants?.edges?.[0]?.node;
+  const priceRange = product.priceRange?.minVariantPrice;
+  
+  const price = parseFloat(firstVariant?.price?.amount || priceRange?.amount || "0");
   const compareAtPrice = parseFloat(firstVariant?.compareAtPrice?.amount || "0");
-  const currency = firstVariant?.price?.currencyCode || 'INR';
+  const currency = firstVariant?.price?.currencyCode || priceRange?.currencyCode || 'INR';
 
   const firstImage = product.images?.edges?.[0]?.node?.url || product.featuredImage?.url;
   const secondImage = product.images?.edges?.[1]?.node?.url;
@@ -142,7 +123,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <div className="flex items-center">
                 <div 
                   className="w-2.5 h-2.5 rounded-full border border-gray-200 mr-2"
-                  style={{ backgroundColor: COLOR_MAP[colorValues[0].toLowerCase()] || '#E2E2E2' }}
+                  style={{ backgroundColor: getColorHex(colorValues[0]) }}
                 />
                 <span className="text-[10px] text-[#5A665D] uppercase tracking-widest font-medium">
                   {colorValues.length} {colorValues.length === 1 ? 'Colour' : 'Colours'}

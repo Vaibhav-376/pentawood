@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+export const dynamic = "force-dynamic";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./components/Navbar";
@@ -24,6 +25,8 @@ export const metadata: Metadata = {
   description: "A new standard in premium clothing. Thoughtfully crafted essentials.",
 };
 
+import Script from 'next/script';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -32,10 +35,10 @@ export default async function RootLayout({
   let collections = [];
   let menu = null;
   try {
-    const collectionsData = await shopifyFetch(getCollectionsQuery);
+    const collectionsData = await shopifyFetch(getCollectionsQuery, {}, "collections-cache", 3600);
     collections = collectionsData?.collections?.edges || [];
     
-    const menuData = await shopifyFetch(getMenuQuery, { handle: "main-menu" });
+    const menuData = await shopifyFetch(getMenuQuery, { handle: "main-menu" }, "main-menu-cache", 3600);
     menu = menuData?.menu;
   } catch (error) {
     console.error("Layout Shopify error:", error);
@@ -60,10 +63,11 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-background text-foreground flex flex-col min-h-screen`}
       >
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <CartProvider>
           <Navbar collections={collections} menu={menu} customerName={customerName} />
           <CartDrawer isLoggedIn={!!token} />
-          <main className="flex-grow pt-14 md:pt-16">
+          <main className="flex-grow pt-16 md:pt-20">
             {children}
           </main>
           <Footer />

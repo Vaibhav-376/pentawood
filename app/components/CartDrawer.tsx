@@ -45,9 +45,18 @@ export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  {cart.lines?.edges?.map(({ node }: any) => {
+                  {cart.lines?.edges?.filter(({ node }: any) => node.quantity > 0).map(({ node }: any) => {
                     const product = node.merchandise.product;
                     const variantTitle = node.merchandise.title !== "Default Title" ? node.merchandise.title : "";
+                    const formatCurrency = (amount: string | number, currencyCode: string) => {
+                      return new Intl.NumberFormat('en-IN', {
+                        style: 'currency',
+                        currency: currencyCode,
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      }).format(Number(amount));
+                    };
+
                     return (
                       <div key={node.id} className="flex gap-6 group">
                         <div className="w-20 h-24 bg-[#F2EFEA] flex-shrink-0 relative overflow-hidden rounded-sm">
@@ -65,17 +74,19 @@ export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
                             <button 
                                onClick={() => removeItemFromCart(node.id)} 
                                disabled={isLoading}
-                               className="text-[#5A665D] hover:text-red-700 transition-colors py-1 disabled:opacity-30"
+                               className="text-[#5A665D] hover:text-red-700 transition-colors p-2 -mr-2 disabled:opacity-30"
                                title="Remove item"
                             >
-                               <Trash2 className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={1.5} />
+                               <Trash2 className="w-4 h-4" strokeWidth={1.5} />
                             </button>
                           </div>
                           
                           <div className="mt-auto flex justify-between items-end w-full">
                             <p className="text-[10px] text-[#5A665D] uppercase tracking-widest">Qty: {node.quantity}</p>
                             <div className="text-right">
-                              <p className="text-sm text-[#2C352D] font-medium">${node.cost.totalAmount.amount}</p>
+                              <p className="text-sm text-[#2C352D] font-medium">
+                                {formatCurrency(node.cost.totalAmount.amount, node.cost.totalAmount.currencyCode)}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -90,30 +101,23 @@ export function CartDrawer({ isLoggedIn }: { isLoggedIn: boolean }) {
               <div className="p-6 md:p-8 border-t border-[#C5BAA8]/30 bg-[#F2EFEA]">
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-[#5A665D] uppercase tracking-widest text-xs font-medium">Subtotal</span>
-                  <span className="text-xl font-medium text-[#2C352D]">${cart.cost.subtotalAmount.amount}</span>
+                  <span className="text-xl font-medium text-[#2C352D]">
+                    {new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: cart.cost.subtotalAmount.currencyCode,
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(Number(cart.cost.subtotalAmount.amount))}
+                  </span>
                 </div>
                 
-                {isLoggedIn ? (
-                  <a 
-                    href={cart.checkoutUrl} 
-                    className="w-full bg-[#2C352D] hover:bg-black text-white text-center py-5 uppercase tracking-[0.2em] text-xs font-medium transition-colors block rounded-sm shadow-md"
-                  >
-                    Checkout
-                  </a>
-                ) : (
-                  <div className="space-y-4">
-                    <p className="text-[10px] text-center text-red-600 uppercase tracking-widest font-medium">
-                      Please sign in to complete your purchase
-                    </p>
-                    <Link 
-                      href="/login" 
-                      onClick={closeCart}
-                      className="w-full bg-[#2C352D] hover:bg-black text-white text-center py-5 uppercase tracking-[0.2em] text-xs font-medium transition-colors block rounded-sm shadow-md"
-                    >
-                      Sign In to Checkout
-                    </Link>
-                  </div>
-                )}
+                <Link 
+                  href="/checkout" 
+                  onClick={closeCart}
+                  className="w-full bg-[#2C352D] hover:bg-black text-white text-center py-5 uppercase tracking-[0.2em] text-xs font-medium transition-colors block rounded-sm shadow-md"
+                >
+                  Proceed to Checkout
+                </Link>
               </div>
             )}
           </motion.div>

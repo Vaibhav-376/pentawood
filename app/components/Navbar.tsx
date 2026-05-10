@@ -8,10 +8,12 @@ import { useCart } from "@/lib/cart-context";
 import { useDebounce } from "@/hooks/use-debounce";
 import Image from "next/image";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export function Navbar({ collections = [], menu, customerName }: { collections: any[], menu?: any, customerName?: string | null }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -83,9 +85,9 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled || activeDropdown
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled || activeDropdown
             ? "bg-[#EAE8DF]/95 backdrop-blur-md py-2 shadow-sm border-b border-[#C5BAA8]/20"
-            : "bg-[#EAE8DF]"
+            : "bg-[#EAE8DF] py-2"
           }`}
         onMouseLeave={() => setActiveDropdown(null)}
       >
@@ -162,9 +164,9 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
               <Image 
                 src="/pwlogo.png" 
                 alt="Logo" 
-                width={120} 
-                height={40} 
-                className={`${isScrolled ? 'w-16' : 'w-20'} md:w-24 h-auto object-contain transition-all duration-500`} 
+                width={240} 
+                height={80} 
+                className={`${isScrolled ? 'w-14' : 'w-16'} md:w-20 h-auto object-contain transition-all duration-500`} 
                 priority
               />
             </Link>
@@ -231,6 +233,15 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
             transition={{ type: "spring", damping: 30, stiffness: 200 }}
             className="fixed inset-0 z-[60] bg-[#FDFBF7] flex flex-col pt-24 px-8 overflow-y-auto"
           >
+            <div className="absolute top-8 left-8">
+              <Image 
+                src="/pwlogo.png" 
+                alt="Logo" 
+                width={100} 
+                height={30} 
+                className="w-20 h-auto object-contain" 
+              />
+            </div>
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="absolute top-8 right-8 text-[#29402E] transition-transform duration-300"
@@ -238,7 +249,21 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
               <X className="w-6 h-6" strokeWidth={1.5} />
             </button>
 
-            <nav className="flex flex-col space-y-2 mt-8">
+            {/* Search Bar - Repositioned to top for better UX */}
+            <div className="mt-12 mb-8">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center border-b border-[#C5BAA8]/30 pb-3">
+                <Search className="w-4 h-4 text-[#5A665D] absolute left-0" strokeWidth={1.5} />
+                <input
+                  type="text"
+                  placeholder="SEARCH OUR COLLECTIONS..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent text-[10px] uppercase tracking-[0.2em] font-medium placeholder:text-[#5A665D]/40 outline-none w-full pl-8"
+                />
+              </form>
+            </div>
+
+            <nav className="flex flex-col space-y-2">
               {navItems.map((item: any) => {
                 const subItems = getDropdownItems(item);
                 const isOpen = mobileAccordion === item.title;
@@ -300,25 +325,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
               })}
             </nav>
 
-            <div className="mt-auto py-8 border-t border-[#C5BAA8]/20 flex flex-col gap-8">
-              {/* Search Bar in Mobile Menu */}
-              <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#F2EFEA] border border-[#C5BAA8]/20 px-4 py-3 rounded-sm">
-                <input
-                  type="text"
-                  placeholder="SEARCH PRODUCTS..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-[11px] uppercase tracking-[0.2em] font-medium placeholder:text-[#5A665D]/50 outline-none w-full"
-                />
-                <button 
-                  type="submit"
-                  className="p-1 hover:text-[#29402E] transition-colors"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-                  </svg>
-                </button>
-              </form>
+            <div className="py-8 border-t border-[#C5BAA8]/20 flex flex-col gap-8">
 
               <div className="grid grid-cols-2 gap-4">
                 {customerName ? (

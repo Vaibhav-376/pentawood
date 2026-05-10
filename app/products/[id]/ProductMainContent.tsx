@@ -2,25 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ProductImageCarousel } from "./ProductImageCarousel";
-import { AddToCartButton } from "./AddToCartButton";
-
-interface Option {
-  id: string;
-  name: string;
-  values: string[];
-}
-
-interface Variant {
-  id: string;
-  title: string;
-  image?: {
-    url: string;
-  };
-  selectedOptions: {
-    name: string;
-    value: string;
-  }[];
-}
+import { AddToCartButton, type Option, type Variant } from "./AddToCartButton";
 
 interface ProductMainContentProps {
   images: string[];

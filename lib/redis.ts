@@ -1,22 +1,16 @@
 import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
 
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+// Initialize Redis client
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
-const isConfigured = 
-  redisUrl && 
-  redisUrl !== "your_upstash_redis_url_here" && 
-  redisUrl.startsWith("https://") &&
-  redisToken && 
-  redisToken !== "your_upstash_redis_token_here";
-
-if (!isConfigured) {
-  console.warn("Upstash Redis is not properly configured. Rate limiting will be disabled.");
-}
-
-export const redis = isConfigured 
-  ? new Redis({
-      url: redisUrl,
-      token: redisToken,
-    })
-  : null;
+// Create a new ratelimiter, that allows 10 requests per 10 seconds
+export const ratelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(10, "10 s"),
+  analytics: true,
+  prefix: "@upstash/ratelimit",
+});

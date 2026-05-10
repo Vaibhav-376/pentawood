@@ -249,30 +249,50 @@ query getCustomer($customerAccessToken: String!) {
 }
 `;
 
-export const createCartMutation = `
-mutation cartCreate($input: CartInput) {
-  cartCreate(input: $input) {
-    cart {
-      id
-      checkoutUrl
-      totalQuantity
-      lines(first: 10) {
-        edges {
-          node {
+const CART_FIELDS = `
+  id
+  checkoutUrl
+  totalQuantity
+  cost {
+    subtotalAmount {
+      amount
+      currencyCode
+    }
+  }
+  lines(first: 50) {
+    edges {
+      node {
+        id
+        quantity
+        cost {
+          totalAmount {
+            amount
+            currencyCode
+          }
+        }
+        merchandise {
+          ... on ProductVariant {
             id
-            quantity
-            merchandise {
-              ... on ProductVariant {
-                id
-                title
-                product {
-                  title
-                }
-              }
+            title
+            image {
+              url
+            }
+            product {
+              title
+              handle
             }
           }
         }
       }
+    }
+  }
+`;
+
+export const createCartMutation = `
+mutation cartCreate($input: CartInput) {
+  cartCreate(input: $input) {
+    cart {
+      ${CART_FIELDS}
     }
     userErrors {
       field
@@ -286,42 +306,7 @@ export const addToCartMutation = `
 mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
   cartLinesAdd(cartId: $cartId, lines: $lines) {
     cart {
-      id
-      checkoutUrl
-      totalQuantity
-      cost {
-        subtotalAmount {
-          amount
-          currencyCode
-        }
-      }
-      lines(first: 50) {
-        edges {
-          node {
-            id
-            quantity
-            cost {
-              totalAmount {
-                amount
-                currencyCode
-              }
-            }
-            merchandise {
-              ... on ProductVariant {
-                id
-                title
-                image {
-                  url
-                }
-                product {
-                  title
-                  handle
-                }
-              }
-            }
-          }
-        }
-      }
+      ${CART_FIELDS}
     }
     userErrors {
       field
@@ -335,42 +320,11 @@ export const removeFromCartMutation = `
 mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
   cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
     cart {
-      id
-      checkoutUrl
-      totalQuantity
-      cost {
-        subtotalAmount {
-          amount
-          currencyCode
-        }
-      }
-      lines(first: 50) {
-        edges {
-          node {
-            id
-            quantity
-            cost {
-              totalAmount {
-                amount
-                currencyCode
-              }
-            }
-            merchandise {
-              ... on ProductVariant {
-                id
-                title
-                image {
-                  url
-                }
-                product {
-                  title
-                  handle
-                }
-              }
-            }
-          }
-        }
-      }
+      ${CART_FIELDS}
+    }
+    userErrors {
+      field
+      message
     }
   }
 }
@@ -379,42 +333,7 @@ mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
 export const getCartQuery = `
 query getCart($cartId: ID!) {
   cart(id: $cartId) {
-    id
-    checkoutUrl
-    totalQuantity
-    cost {
-      subtotalAmount {
-        amount
-        currencyCode
-      }
-    }
-    lines(first: 50) {
-      edges {
-        node {
-          id
-          quantity
-          cost {
-            totalAmount {
-              amount
-              currencyCode
-            }
-          }
-          merchandise {
-            ... on ProductVariant {
-              id
-              title
-              image {
-                url
-              }
-              product {
-                title
-                handle
-              }
-            }
-          }
-        }
-      }
-    }
+    ${CART_FIELDS}
   }
 }
 `;
@@ -455,6 +374,20 @@ query SearchProducts($query: String!) {
           minVariantPrice {
             amount
             currencyCode
+          }
+        }
+        variants(first: 1) {
+          edges {
+            node {
+              price {
+                amount
+                currencyCode
+              }
+              compareAtPrice {
+                amount
+                currencyCode
+              }
+            }
           }
         }
       }
