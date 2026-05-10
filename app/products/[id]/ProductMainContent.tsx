@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProductImageCarousel } from "./ProductImageCarousel";
 import { AddToCartButton, type Option, type Variant } from "./AddToCartButton";
+import ProductCard from "@/app/components/ProductCard";
 
 interface ProductMainContentProps {
   images: string[];
@@ -14,6 +15,8 @@ interface ProductMainContentProps {
   formattedComparePrice: string | null;
   discount: number;
   descriptionHtml: string;
+  isLoggedIn: boolean;
+  recommendations: any[];
 }
 
 export function ProductMainContent({
@@ -24,7 +27,9 @@ export function ProductMainContent({
   formattedPrice,
   formattedComparePrice,
   discount,
-  descriptionHtml
+  descriptionHtml,
+  isLoggedIn,
+  recommendations
 }: ProductMainContentProps) {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
@@ -49,7 +54,8 @@ export function ProductMainContent({
   const variantImage = selectedVariant?.image?.url;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 relative mt-12">
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 relative mt-12">
       <div className="relative">
         <ProductImageCarousel 
           images={images} 
@@ -58,7 +64,7 @@ export function ProductMainContent({
         />
       </div>
 
-      <div className="md:sticky md:top-32 self-start h-fit mb-12">
+      <div className="md:sticky md:top-32 self-start h-fit mb-4">
         <div className="mb-4">
           <span className="bg-[#29402E] text-white text-[10px] uppercase tracking-widest px-3 py-1 font-bold">
             Sale
@@ -81,20 +87,21 @@ export function ProductMainContent({
           )}
         </div>
         
-        <div 
-          className="text-[#5A665D] font-light leading-relaxed mb-10 tracking-wide prose prose-p:mb-4 prose-a:text-[#2C352D] prose-a:underline prose-li:mb-2 max-w-none"
-          dangerouslySetInnerHTML={{ __html: descriptionHtml }}
-        />
-
         <AddToCartButton 
           options={options} 
           variants={variants} 
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
           selectedVariant={selectedVariant}
+          isLoggedIn={isLoggedIn}
         />
 
-        <div className="mt-16 border-t border-[#C5BAA8]/50">
+        <div 
+          className="text-[#5A665D] font-light leading-relaxed mb-6 tracking-wide prose prose-p:mb-4 prose-a:text-[#2C352D] prose-a:underline prose-li:mb-2 max-w-none"
+          dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+        />
+
+        <div className="mt-8 border-t border-[#C5BAA8]/50">
           {[
             { 
               id: "details", 
@@ -152,5 +159,22 @@ export function ProductMainContent({
         </div>
       </div>
     </div>
+    
+    {/* Recommendations Section - Outside the main grid to avoid sticky overlap */}
+    {recommendations.length > 0 && (
+      <div className="mt-12 pt-12 border-t border-[#C5BAA8]/30">
+        <div className="text-center mb-16">
+          <h2 className="font-serif text-3xl md:text-4xl text-[#2C352D] mb-4">You May Also Like</h2>
+          <div className="w-12 h-0.5 bg-[#29402E] mx-auto opacity-30"></div>
+        </div>
+        
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 md:gap-x-12 gap-y-16 md:gap-y-24">
+          {recommendations.slice(0, 4).map((product: any) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
+    )}
+</>
   );
 }

@@ -395,3 +395,37 @@ query SearchProducts($query: String!) {
   }
 }
 `;
+
+export const getProductRecommendationsQuery = `
+query GetProductRecommendations($productId: ID!) {
+  productRecommendations(productId: $productId) {
+    id
+    title
+    handle
+    featuredImage {
+      url
+      altText
+    }
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    variants(first: 1) {
+      edges {
+        node {
+          price {
+            amount
+            currencyCode
+          }
+          compareAtPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
+}
+`;

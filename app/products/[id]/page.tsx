@@ -1,19 +1,29 @@
 import { shopifyFetch } from "@/lib/shopify";
-import { getProductQuery } from "@/lib/queries";
+import { getProductQuery, getProductRecommendationsQuery } from "@/lib/queries";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { ProductMainContent } from "./ProductMainContent";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("customerAccessToken")?.value;
   const { id } = await params;
   
   let productData;
+  let recommendations = [];
+  
   try {
     const data = await shopifyFetch(getProductQuery, { handle: id });
     productData = data?.product;
+    
+    if (productData?.id) {
+      const recData = await shopifyFetch(getProductRecommendationsQuery, { productId: productData.id });
+      recommendations = recData?.productRecommendations || [];
+    }
   } catch (error) {
-    console.error("Failed to fetch product:", error);
+    console.error("Failed to fetch product data:", error);
   }
 
   if (!productData) {
@@ -75,6 +85,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           formattedComparePrice={formattedComparePrice}
           discount={discount}
           descriptionHtml={descriptionHtml}
+          isLoggedIn={!!token}
+          recommendations={recommendations}
         />
       </div>
     </div>

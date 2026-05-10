@@ -97,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Metadata */}
-      <div className="flex flex-col pt-3">
+      <div className="flex flex-col pt-3 px-1 md:px-2">
         <div className="flex justify-between items-start gap-2 mb-1.5">
           <Link href={`/products/${product.handle}`} className="flex-1">
             <h2 className="text-[#29402E] text-[13px] md:text-sm font-medium line-clamp-2 uppercase tracking-wide">
