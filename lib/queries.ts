@@ -370,6 +370,15 @@ query SearchProducts($query: String!) {
           url
           altText
         }
+        images(first: 10) {
+          edges {
+            node {
+              id
+              url
+              altText
+            }
+          }
+        }
         priceRange {
           minVariantPrice {
             amount
@@ -405,6 +414,15 @@ query GetProductRecommendations($productId: ID!) {
     featuredImage {
       url
       altText
+    }
+    images(first: 10) {
+      edges {
+        node {
+          id
+          url
+          altText
+        }
+      }
     }
     priceRange {
       minVariantPrice {

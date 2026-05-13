@@ -12,7 +12,7 @@ export default async function Home() {
 
   try {
     const productsData = await shopifyFetch(getAllProductsQuery);
-    products = productsData?.products?.edges?.slice(0, 4) || [];
+    products = productsData?.products?.edges || [];
 
     const collectionsData = await shopifyFetch(getCollectionsQuery);
     collections = collectionsData?.collections?.edges?.filter(({ node }: any) => 
@@ -113,12 +113,9 @@ export default async function Home() {
               <span className="text-[#C5BAA8] uppercase tracking-[0.3em] text-[10px] font-bold mb-1 block">Store</span>
               <h2 className="font-serif text-4xl md:text-5xl font-light text-[#29402E] tracking-tight">New Arrivals</h2>
             </div>
-            <Link href="/products" className="hidden sm:block text-[10px] uppercase tracking-[0.3em] border-b-2 border-[#29402E] pb-1 hover:opacity-70 transition-all font-bold">
-              Explore All
-            </Link>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 md:gap-x-12 gap-y-12 md:gap-y-16">
             {products.length > 0 ? (
               products.map(({ node }: any) => (
                 <ProductCard key={node.id} product={node} />
@@ -128,12 +125,6 @@ export default async function Home() {
                 Our latest collection is arriving soon.
               </div>
             )}
-          </div>
-          
-          <div className="mt-16 text-center sm:hidden">
-            <Link href="/products" className="text-[10px] uppercase tracking-[0.3em] border-b-2 border-[#29402E] pb-1 font-bold">
-              Explore All
-            </Link>
           </div>
         </div>
       </section>
