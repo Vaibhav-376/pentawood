@@ -1,0 +1,18 @@
+datasource db {
+  provider = "mongodb"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Inquiry {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  subject   String
+  orderId   String?
+  message   String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}

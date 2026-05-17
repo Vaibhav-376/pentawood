@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 export const dynamic = "force-dynamic";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -25,6 +25,13 @@ export const metadata: Metadata = {
   description: "A new standard in premium clothing. Thoughtfully crafted essentials.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 import Script from 'next/script';
 
 export default async function RootLayout({
@@ -38,7 +45,7 @@ export default async function RootLayout({
     const collectionsData = await shopifyFetch(getCollectionsQuery, {}, "collections-cache", 3600);
     collections = collectionsData?.collections?.edges || [];
     
-    const menuData = await shopifyFetch(getMenuQuery, { handle: "main-menu" }, "main-menu-cache", 3600);
+    const menuData = await shopifyFetch(getMenuQuery, { handle: "main-menu" });
     menu = menuData?.menu;
   } catch (error) {
     console.error("Layout Shopify error:", error);

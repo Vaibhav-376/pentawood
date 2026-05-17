@@ -34,9 +34,9 @@ export function Footer() {
         <div>
           <h4 className="font-serif text-lg text-[#f2ede4] mb-6">Explore</h4>
           <ul className="space-y-4 text-sm font-light text-[#f2ede4]/70">
-            <li><Link href="/collections" className="hover:text-[#f2ede4] transition-colors">Shop All</Link></li>
-            <li><Link href="/collections/men" className="hover:text-[#f2ede4] transition-colors">Men</Link></li>
-            <li><Link href="/collections/women" className="hover:text-[#f2ede4] transition-colors">Women</Link></li>
+            <li><Link href="/products" className="hover:text-[#f2ede4] transition-colors">Shop All</Link></li>
+            <li><Link href="/collections/oversize-shirts" className="hover:text-[#f2ede4] transition-colors">Men</Link></li>
+            <li><Link href="/collections/women-oversize" className="hover:text-[#f2ede4] transition-colors">Women</Link></li>
             <li><Link href="/about" className="hover:text-[#f2ede4] transition-colors">Our Story</Link></li>
           </ul>
         </div>

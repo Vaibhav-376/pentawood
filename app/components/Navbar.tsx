@@ -28,6 +28,7 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
   useEffect(() => {
     if (debouncedSearchQuery) {
       router.push(`/search?q=${encodeURIComponent(debouncedSearchQuery)}`);
+      setMobileMenuOpen(false);
     }
   }, [debouncedSearchQuery, router]);
 
@@ -35,8 +36,15 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
     e.preventDefault();
     if (searchQuery) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setMobileMenuOpen(false);
     }
   };
+
+  useEffect(() => {
+    if (pathname !== "/search") {
+      setSearchQuery("");
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,24 +55,34 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
   }, []);
 
   const getDropdownItems = (item: any) => {
-    // 1. If the menu item has sub-items in Shopify, use them!
+    // 1. If the menu item has sub-items in Shopify, filter them to only show oversize and t-shirts!
     if (item.items && item.items.length > 0) {
-      return item.items.map((subItem: any) => ({
-        title: subItem.title,
-        href: subItem.url.replace(/^https?:\/\/[^\/]+/, '') // Make URL relative
-      }));
+      const filteredItems = item.items.filter((subItem: any) => {
+        const titleLower = subItem.title.toLowerCase();
+        return titleLower.includes("oversize") || titleLower.includes("t-shirt") || titleLower.includes("tshirt") || titleLower.includes("tee");
+      });
+
+      return filteredItems.map((subItem: any) => {
+        const subUrl = subItem.url?.replace(/^https?:\/\/[^\/]+/, '') || "#";
+        return {
+          title: subItem.title,
+          href: subUrl
+        };
+      });
     }
 
-    // 2. Fallback: Filter collections based on the category name (original logic)
+    // 2. Fallback: Filter collections based on category name and ensure only oversize/t-shirt are included
     const lowerTitle = item.title.toLowerCase();
     const filtered = collections.filter(({ node }) => {
       const colTitle = node.title.toLowerCase();
+      const isOversizeOrTshirt = colTitle.includes("oversize") || colTitle.includes("t-shirt") || colTitle.includes("tshirt") || colTitle.includes("tee");
+      if (!isOversizeOrTshirt) return false;
+
       if (lowerTitle === 'men') return colTitle.includes('men') && !colTitle.includes('women');
       if (lowerTitle === 'women') return colTitle.includes('women');
       return colTitle.includes(lowerTitle);
     });
 
-    // 3. Last fallback: return empty if no matches found to avoid "all items" showing up
     return filtered.map(({ node }) => ({
       title: node.title,
       href: `/collections/${node.handle}`
@@ -74,15 +92,19 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
   const navItems = (menu?.items?.length > 0 ? menu.items : [
     { title: "Men", url: "/collections/men" },
     { title: "Women", url: "/collections/women" },
-    { title: "Sale", url: "/collections/sale" },
-    { title: "New Arrivals", url: "/collections/new-arrivals" },
-    { title: "Collection", url: "/collections" }
-  ]).map((item: any) => ({
-    ...item,
-    url: item.url?.replace(/^https?:\/\/[^\/]+/, '') || `/collections/${item.title.toLowerCase().replace(' ', '-')}`
-  }));
+    { title: "Sale", url: "/products" },
+  ]).map((item: any) => {
+    let rawUrl = item.url?.replace(/^https?:\/\/[^\/]+/, '') || `/collections/${item.title.toLowerCase().replace(' ', '-')}`;
+    if (item.title.toLowerCase() === "sale") {
+      rawUrl = "/products";
+    }
+    return {
+      ...item,
+      url: rawUrl
+    };
+  });
 
-  return (
+  return (  
     <>
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled || activeDropdown
@@ -179,14 +201,23 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
               <Link href="/search" className="md:hidden hover:text-[#29402E] transition-colors">
                 <Search className="w-5 h-5" strokeWidth={1.5} />
               </Link>
-              <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center bg-[#F2EFEA]/30 border border-[#C5BAA8]/20 px-3 py-1 rounded-sm">
+              <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center bg-[#F2EFEA]/30 border border-[#C5BAA8]/20 px-3 py-1 rounded-sm relative">
                 <input
                   type="text"
                   placeholder="SEARCH..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-[10px] uppercase tracking-[0.15em] font-medium placeholder:text-[#5A665D]/50 outline-none w-[80px] focus:w-[120px] transition-all duration-300"
+                  className="bg-transparent text-[10px] uppercase tracking-[0.15em] font-medium placeholder:text-[#5A665D]/50 outline-none w-[80px] focus:w-[120px] transition-all duration-300 pr-5"
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 text-[#5A665D] hover:text-[#29402E] transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" strokeWidth={1.5} />
+                  </button>
+                )}
               </form>
             </div>
 
@@ -258,8 +289,17 @@ export function Navbar({ collections = [], menu, customerName }: { collections: 
                   placeholder="SEARCH OUR COLLECTIONS..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-[10px] uppercase tracking-[0.2em] font-medium placeholder:text-[#5A665D]/40 outline-none w-full pl-8"
+                  className="bg-transparent text-base md:text-xs uppercase tracking-[0.2em] font-medium placeholder:text-[#5A665D]/40 outline-none w-full pl-8 pr-8"
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-0 text-[#5A665D] hover:text-[#29402E] transition-colors p-1"
+                  >
+                    <X className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                )}
               </form>
             </div>
 

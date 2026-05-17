@@ -42,9 +42,14 @@ export function ProductMainContent({
 
   const selectedVariant = useMemo(() => {
     const variant = variants.find(variant => {
-      return variant.selectedOptions.every(
-        option => selectedOptions[option.name] === option.value
-      );
+      return variant.selectedOptions.every(opt => {
+        const matchingKey = Object.keys(selectedOptions).find(
+          key => key.toLowerCase().trim() === opt.name.toLowerCase().trim()
+        );
+        if (!matchingKey) return false;
+        const selectedVal = selectedOptions[matchingKey];
+        return selectedVal.toLowerCase().trim() === opt.value.toLowerCase().trim();
+      });
     });
     console.log("Selected Variant:", variant?.id, selectedOptions);
     return variant;

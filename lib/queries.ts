@@ -447,3 +447,14 @@ query GetProductRecommendations($productId: ID!) {
   }
 }
 `;
+
+export const getPageQuery = `
+query getPage($handle: String!) {
+  page(handle: $handle) {
+    id
+    title
+    body
+    bodySummary
+  }
+}
+`;
