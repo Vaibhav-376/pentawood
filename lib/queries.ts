@@ -29,7 +29,7 @@ query GetAllProducts {
           values
         }
 
-        variants(first: 20) {
+        variants(first: 100) {
           edges {
             node {
               id
@@ -90,7 +90,7 @@ query GetCollectionProducts($handle: String!) {
             values
           }
 
-          variants(first: 20) {
+          variants(first: 100) {
             edges {
               node {
                 id
@@ -165,7 +165,7 @@ query GetProduct($handle: String!) {
         }
       }
     }
-    variants(first: 20) {
+    variants(first: 100) {
       edges {
         node {
           id

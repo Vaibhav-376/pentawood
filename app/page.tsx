@@ -135,7 +135,7 @@ export default async function Home() {
           <div className="grid grid-cols-12 grid-rows-2 gap-4 h-[600px] md:h-[800px]">
             <div className="col-span-8 row-span-2 relative bg-[#F2EFEA] overflow-hidden group">
               <Image 
-                src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200&auto=format&fit=crop"
+                src="/lifestyle/img1.PNG"
                 alt="Lifestyle 1"
                 fill
                 className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -144,7 +144,7 @@ export default async function Home() {
             </div>
             <div className="col-span-4 row-span-1 relative bg-[#F2EFEA] overflow-hidden group">
               <Image 
-                src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=800&auto=format&fit=crop"
+                src="/lifestyle/img2.PNG"
                 alt="Lifestyle 2"
                 fill
                 className="object-cover transition-transform duration-1000 group-hover:scale-105"

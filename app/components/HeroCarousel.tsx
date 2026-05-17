@@ -11,8 +11,8 @@ const HERO_SLIDES = [
     tagline: "Signature Collection",
     title: "Minimalist living, redefined.",
     description: "Discover our latest drop featuring clean lines, premium fabrics, and a palette inspired by the earth.",
-    desktopImage: "/desktop/pw.PNG",
-    mobileImage: "/mobile/mobile.PNG",
+    desktopImage: "/desktop/1.PNG",
+    mobileImage: "/mobile/mobile2.PNG",
     bgColor: "#EAE8DF"
   },
   {
@@ -20,8 +20,8 @@ const HERO_SLIDES = [
     tagline: "The Essentials",
     title: "Timeless pieces. Modern silhouettes.",
     description: "Premium clothing crafted with meticulous attention to detail. Designed in beige and subtle greens.",
-    desktopImage: "/desktop/pwmini.PNG",
-    mobileImage: "/mobile/mobile.PNG", // Fallback to the available mobile image for now
+    desktopImage: "/desktop/img4.PNG",
+    mobileImage: "/mobile/mobile3.PNG", 
     bgColor: "#EAE8DF"
   },
   {
@@ -30,9 +30,18 @@ const HERO_SLIDES = [
     title: "The Summer Lookbook.",
     description: "Lightweight fabrics and breathable silhouettes designed for the warmer months ahead.",
     desktopImage: "/desktop/image.PNG",
-    mobileImage: "/mobile/mobile.PNG", // Fallback to the available mobile image for now
+    mobileImage: "/mobile/mobile.PNG",
     bgColor: "#FDFBF7"
-  }
+  },
+    {
+    id: 4,
+    tagline: "The Essentials",
+    title: "Timeless pieces. Modern silhouettes.",
+    description: "Premium clothing crafted with meticulous attention to detail. Designed in beige and subtle greens.",
+    desktopImage: "/desktop/2.PNG",
+    mobileImage: "/mobile/mobile4.PNG", // Fallback to the available mobile image for now
+    bgColor: "#EAE8DF"
+  },
 ];
 
 export function HeroCarousel() {
@@ -53,7 +62,7 @@ export function HeroCarousel() {
   const currentSlide = HERO_SLIDES[current] || HERO_SLIDES[0];
 
   return (
-    <section className="relative h-[70vh] w-full overflow-hidden bg-[#F7F7F7]">
+    <section className="relative h-[67vh] w-full overflow-hidden bg-[#F7F7F7]">
       <AnimatePresence initial={false}>
         <motion.div
           key={current}
